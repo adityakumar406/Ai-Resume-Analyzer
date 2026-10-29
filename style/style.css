@@ -56,7 +56,7 @@ html, body, [class*="css"] {
 }
 
 [data-testid="stAppViewContainer"] > .main {
-    padding: 2.5rem clamp(1rem, 4vw, 4rem) 4rem;
+    padding: 2rem clamp(0.75rem, 2vw, 1.5rem) 3rem;
 }
 
 [data-testid="stSidebar"] {
@@ -103,6 +103,12 @@ html, body, [class*="css"] {
     color: var(--text-primary);
     transform: none;
     box-shadow: none;
+}
+
+[data-testid="stSidebar"] .stButton > button[data-testid="stBaseButton-primary"] {
+    background: rgba(54, 194, 180, 0.16);
+    border-color: rgba(54, 194, 180, 0.4);
+    color: var(--text-primary);
 }
 
 .page-header,
@@ -324,24 +330,6 @@ body {
 .stCard:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* Button Styling */
-.stButton > button {
-    background: var(--primary-gradient);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 180, 219, 0.4);
 }
 
 /* Input Fields */

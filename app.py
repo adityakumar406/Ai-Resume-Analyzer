@@ -6,7 +6,7 @@ from PIL import Image
 from jobs.job_search import render_job_search
 from datetime import datetime
 from ui_components import (
-    apply_modern_styles, hero_section, feature_card,
+    apply_modern_styles,
     page_header, render_analytics_section, render_activity_section,
     render_suggestions_section
 )
@@ -17,8 +17,6 @@ from docx import Document
 import io
 import base64
 import plotly.graph_objects as go
-from streamlit_lottie import st_lottie
-import requests
 from dashboard.dashboard import DashboardManager
 from config.courses import COURSES_BY_CATEGORY, RESUME_VIDEOS, INTERVIEW_VIDEOS, get_courses_for_role, get_category_for_role
 from config.job_roles import JOB_ROLES
@@ -79,12 +77,20 @@ class ResumeApp:
             st.session_state.is_admin = False
 
         self.pages = {
-            "🏠 HOME": self.render_home,
-            "🔍 RESUME ANALYZER": self.render_analyzer,
-            "📝 RESUME BUILDER": self.render_builder,
-            "📊 DASHBOARD": self.render_dashboard,
-            "🎯 JOB SEARCH": self.render_job_search,
-            "💬 FEEDBACK": self.render_feedback_page
+            "Home": self.render_home,
+            "Resume analyzer": self.render_analyzer,
+            "Resume builder": self.render_builder,
+            "Dashboard": self.render_dashboard,
+            "Job search": self.render_job_search,
+            "Feedback": self.render_feedback_page
+        }
+        self.page_icons = {
+            "Home": ":material/home:",
+            "Resume analyzer": ":material/description:",
+            "Resume builder": ":material/edit_document:",
+            "Dashboard": ":material/space_dashboard:",
+            "Job search": ":material/work:",
+            "Feedback": ":material/forum:"
         }
 
         # Initialize dashboard manager
@@ -122,13 +128,6 @@ class ResumeApp:
                 'total_analyses': 0,
                 'average_score': 0
             }
-
-    def load_lottie_url(self, url: str):
-        """Load Lottie animation from URL"""
-        r = requests.get(url)
-        if r.status_code != 200:
-            return None
-        return r.json()
 
     def apply_global_styles(self):
         st.markdown("""
@@ -546,7 +545,6 @@ class ResumeApp:
         """Render the dashboard page"""
         self.dashboard_manager.render_dashboard()
 
-        st.toast("Check out these repositories: [Awesome Hacking](https://github.com/Hunterdii/Awesome-Hacking)", icon="ℹ️")
 
 
     def render_empty_state(self, icon, message):
@@ -990,7 +988,6 @@ class ResumeApp:
                 print(f"Full traceback: {traceback.format_exc()}")
                 st.error(f"❌ Error preparing resume data: {str(e)}")
 
-        st.toast("Check out these repositories: [30-Days-Of-Rust](https://github.com/Hunterdii/30-Days-Of-Rust)", icon="ℹ️")
 
     def render_about(self):
         """Render the about page"""
@@ -1228,7 +1225,6 @@ class ResumeApp:
             </div>
         """, unsafe_allow_html=True)
 
-        st.toast("Check out these repositories: [Iriswise](https://github.com/Hunterdii/Iriswise)", icon="ℹ️")
 
     def render_analyzer(self):
         """Render the resume analyzer page"""
@@ -2785,59 +2781,96 @@ class ResumeApp:
                             import traceback as tb
                             st.code(tb.format_exc())
 
-        st.toast("Check out these repositories: [Awesome Java](https://github.com/Hunterdii/Awesome-Java)", icon="ℹ️")
 
 
     def render_home(self):
-        apply_modern_styles()
-        
-        # Hero Section
-        hero_section(
-            "AI Resume Analyzer",
-            "Transform your career with AI-powered resume analysis and building. Get personalized insights and create professional resumes that stand out."
-        )
-        
-        # Features Section
-        st.markdown('<div class="feature-grid">', unsafe_allow_html=True)
-        
-        feature_card(
-            "fas fa-robot",
-            "AI-Powered Analysis",
-            "Get instant feedback on your resume with advanced AI analysis that identifies strengths and areas for improvement."
-        )
-        
-        feature_card(
-            "fas fa-magic",
-            "Smart Resume Builder",
-            "Create professional resumes with our intelligent builder that suggests optimal content and formatting."
-        )
-        
-        feature_card(
-            "fas fa-chart-line",
-            "Career Insights",
-            "Access detailed analytics and personalized recommendations to enhance your career prospects."
-        )
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        st.toast("Check out these repositories: [AI-Nexus(AI/ML)](https://github.com/Hunterdii/AI-Nexus)", icon="ℹ️")
+        with st.container(border=True):
+            st.badge(
+                "Your career toolkit",
+                icon=":material/auto_awesome:",
+                color="blue"
+            )
+            st.title("Make your next move count")
+            st.write(
+                "Turn your experience into a stronger application. Review your resume, "
+                "get practical feedback, and build a polished version in one place."
+            )
 
-        # Call-to-Action with Streamlit navigation
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col2:
-            if st.button("Get Started", key="get_started_btn", 
-                        help="Click to start analyzing your resume",
-                        type="primary",
-                        width='stretch'):
-                cleaned_name = "🔍 RESUME ANALYZER".lower().replace(" ", "_").replace("🔍", "").strip()
-                st.session_state.page = cleaned_name
+            analyze, build = st.columns(2, gap="small")
+            with analyze:
+                if st.button(
+                    "Analyze a resume",
+                    key="home_analyze_resume",
+                    type="primary",
+                    icon=":material/analytics:",
+                    width="stretch"
+                ):
+                    st.session_state.page = "resume_analyzer"
+                    st.rerun()
+            with build:
+                if st.button(
+                    "Build a resume",
+                    key="home_build_resume",
+                    icon=":material/edit_document:",
+                    width="stretch"
+                ):
+                    st.session_state.page = "resume_builder"
+                    st.rerun()
+
+        st.subheader("A simple workflow", icon=":material/route:")
+        steps = st.columns(3, gap="small")
+        for column, number, title in zip(
+            steps,
+            ("01", "02", "03"),
+            ("Add your resume", "Review feedback", "Improve your application")
+        ):
+            with column:
+                with st.container(border=True):
+                    st.caption(number)
+                    st.write(f"**{title}**")
+
+        st.subheader("Explore your toolkit", icon=":material/widgets:")
+        dashboard, jobs = st.columns(2, gap="medium")
+
+        with dashboard:
+            with st.container(border=True, height="stretch"):
+                st.subheader("Career dashboard", icon=":material/space_dashboard:")
+                st.caption("Review saved resume activity and analysis insights.")
+                if st.button("Open dashboard", key="home_open_dashboard", width="stretch"):
+                    st.session_state.page = "dashboard"
+                    st.rerun()
+
+        with jobs:
+            with st.container(border=True, height="stretch"):
+                st.subheader("Job search", icon=":material/work:")
+                st.caption("Explore roles and resources for your next opportunity.")
+                if st.button("Explore jobs", key="home_open_jobs", width="stretch"):
+                    st.session_state.page = "job_search"
+                    st.rerun()
+
+        with st.container(
+            horizontal=True,
+            horizontal_alignment="distribute",
+            vertical_alignment="center",
+            border=True
+        ):
+            st.markdown(
+                "**Share feedback**  \n"
+                "Tell us what would make your experience better."
+            )
+            if st.button(
+                "Send feedback",
+                key="home_open_feedback",
+                icon=":material/forum:",
+                width="content"
+            ):
+                st.session_state.page = "feedback"
                 st.rerun()
 
     def render_job_search(self):
         """Render the job search page"""
         render_job_search()
 
-        st.toast("Check out these repositories: [GeeksforGeeks-POTD](https://github.com/Hunterdii/GeeksforGeeks-POTD)", icon="ℹ️")
 
 
     def render_feedback_page(self):
@@ -2862,7 +2895,6 @@ class ResumeApp:
         with stats_tab:
             feedback_manager.render_feedback_stats()
 
-        st.toast("Check out these repositories: [TryHackMe Free Rooms](https://github.com/Hunterdii/tryhackme-free-rooms)", icon="ℹ️")
 
 
     def show_repo_notification(self):
@@ -2900,15 +2932,22 @@ class ResumeApp:
         
         # Admin login/logout in sidebar
         with st.sidebar:
-            st_lottie(self.load_lottie_url("https://assets5.lottiefiles.com/packages/lf20_xyadoh9h.json"), height=200, key="sidebar_animation")
-            st.title("AI Resume Analyzer")
+            st.title("AI Resume Analyzer", icon=":material/description:")
+            st.caption("Your career toolkit")
             st.markdown("---")
             
             # Navigation buttons
-            for page_name in self.pages.keys():
-                if st.button(page_name, width='stretch'):
-                    cleaned_name = page_name.lower().replace(" ", "_").replace("🏠", "").replace("🔍", "").replace("📝", "").replace("📊", "").replace("🎯", "").replace("💬", "").replace("ℹ️", "").strip()
-                    st.session_state.page = cleaned_name
+            current_page = st.session_state.get("page", "home")
+            for page_name in self.pages:
+                page_key = page_name.lower().replace(" ", "_")
+                if st.button(
+                    page_name,
+                    key=f"navigation_{page_key}",
+                    icon=self.page_icons[page_name],
+                    type="primary" if current_page == page_key else "secondary",
+                    width="stretch"
+                ):
+                    st.session_state.page = page_key
                     st.rerun()
 
             # Add some space before admin login
@@ -2954,7 +2993,7 @@ class ResumeApp:
         current_page = st.session_state.get('page', 'home')
         
         # Create a mapping of cleaned page names to original names
-        page_mapping = {name.lower().replace(" ", "_").replace("🏠", "").replace("🔍", "").replace("📝", "").replace("📊", "").replace("🎯", "").replace("💬", "").replace("ℹ️", "").strip(): name 
+        page_mapping = {name.lower().replace(" ", "_"): name
                        for name in self.pages.keys()}
         
         # Render the appropriate page

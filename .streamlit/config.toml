@@ -1,2 +1,18 @@
 [client]
 toolbarMode = "minimal"
+
+[theme]
+base = "dark"
+primaryColor = "#0f766e"
+backgroundColor = "#0b1220"
+secondaryBackgroundColor = "#111b2d"
+textColor = "#f5f7fb"
+font = "sans-serif"
+baseRadius = "medium"
+buttonRadius = "medium"
+showWidgetBorder = true
+showSidebarBorder = true
+
+[theme.sidebar]
+backgroundColor = "#101a2b"
+secondaryBackgroundColor = "#17243a"
