@@ -151,6 +151,17 @@ If you encounter issues with Chrome on Streamlit Cloud:
 2. Try adding a custom command to run the setup script before the app starts:
    - In the Streamlit Cloud settings, add a "Main file path" of `run_app.py` instead of `app.py`
 
+## Vercel Deployment
+
+The application includes an ASGI entrypoint for Vercel in `api/index.py`, configured by `pyproject.toml`. The entrypoint uses Streamlit's `st.App` and requires Streamlit 1.57 or newer.
+
+1. Import the GitHub repository into Vercel and keep the project root set to the repository root.
+2. Leave the build and output directory settings at their defaults; Vercel detects the Python runtime from `requirements.txt`.
+3. Add any required AI provider credentials in the Vercel project's Environment Variables.
+4. Deploy the project. For Streamlit's interactive session connection, enable WebSockets under the Vercel project's Function settings if the project does not already have WebSockets enabled.
+
+Vercel Functions have bounded execution time and ephemeral local filesystems. The application's SQLite databases will not provide durable or shared storage across deployments or function instances; use a hosted database before relying on saved resumes or analytics in production. Job-search features that need Chrome, and OCR/PDF features that need system binaries such as Tesseract or Poppler, may also require a separate service or a host that supports installing those binaries.
+
 ## Docker Deployment
 
 For Docker deployment, you need to include Chrome in your Docker image.
