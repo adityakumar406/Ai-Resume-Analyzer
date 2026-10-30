@@ -6,7 +6,6 @@ import builtins
 if not hasattr(builtins, "xrange"):
     builtins.xrange = range
 
-import google.generativeai as genai
 import pdfplumber
 from pdf2image import convert_from_path
 import pytesseract
@@ -26,8 +25,6 @@ class AIResumeAnalyzer:
         self.google_api_key = os.getenv("GOOGLE_API_KEY")
         self.openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
         
-        if self.google_api_key:
-            genai.configure(api_key=self.google_api_key)
     
     def extract_text_from_pdf(self, pdf_file):
         """Extract text from PDF using pdfplumber and OCR if needed"""
@@ -195,8 +192,6 @@ class AIResumeAnalyzer:
             return {"error": "Google API key is not configured. Please add it to your .env file."}
         
         try:
-            model = genai.GenerativeModel("gemini-2.5-flash")
-            
             base_prompt = f"""
             You are an expert resume analyst with deep knowledge of industry standards, job requirements, and hiring practices across various fields. Your task is to provide a comprehensive, detailed analysis of the resume provided.
             
@@ -262,8 +257,37 @@ class AIResumeAnalyzer:
                 [List specific requirements from the job description that are not addressed in the resume, with recommendations on how to address each gap]
                 """
             
-            response = model.generate_content(base_prompt)
-            analysis = response.text.strip()
+            response = requests.post(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+                headers={"x-goog-api-key": self.google_api_key},
+                json={"contents": [{"parts": [{"text": base_prompt}]}]},
+                timeout=180,
+            )
+            if not response.ok:
+                try:
+                    error_message = response.json().get("error", {}).get("message")
+                except ValueError:
+                    error_message = None
+                return {
+                    "error": (
+                        f"Gemini API returned HTTP {response.status_code}: "
+                        f"{error_message or response.text}"
+                    )
+                }
+
+            response_data = response.json()
+            candidates = response_data.get("candidates", [])
+            if not candidates:
+                return {"error": "Gemini returned no analysis text."}
+
+            parts = candidates[0].get("content", {}).get("parts", [])
+            analysis = "".join(
+                part.get("text", "")
+                for part in parts
+                if isinstance(part.get("text"), str)
+            ).strip()
+            if not analysis:
+                return {"error": "Gemini returned no analysis text."}
             
             # Extract resume score if present
             resume_score = self._extract_score_from_text(analysis)

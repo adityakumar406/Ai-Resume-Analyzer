@@ -1,0 +1,18 @@
+# Optional dependencies for project modules not loaded by the Vercel app.
+streamlit-lottie
+streamlit-custom-notification-box
+pycryptodome
+pdfminer.six
+nltk
+scikit-learn
+openpyxl
+spacy
+selenium
+webdriver-manager
+chromedriver-autoinstaller
+openrouter
+docx2pdf
+docx2txt
+python-pptx
+matplotlib
+seaborn

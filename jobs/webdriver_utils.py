@@ -5,9 +5,6 @@ import platform
 import tempfile
 import subprocess
 import streamlit as st
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 
 # Try to import various webdriver managers with fallbacks
 try:
@@ -132,6 +129,14 @@ def setup_webdriver():
     Returns:
         webdriver.Chrome or None: Configured Chrome webdriver or None if setup fails
     """
+    try:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.service import Service
+        from selenium.webdriver.chrome.options import Options
+    except ImportError:
+        st.error("LinkedIn scraping requires the optional Selenium dependencies.")
+        return None
+
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')

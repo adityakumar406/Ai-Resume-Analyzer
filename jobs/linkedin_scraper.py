@@ -3,12 +3,17 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from streamlit_extras.add_vertical_space import add_vertical_space
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 import warnings
 warnings.filterwarnings('ignore')
+
+try:
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.common.keys import Keys
+    from selenium.common.exceptions import NoSuchElementException
+except ImportError:
+    SELENIUM_AVAILABLE = False
+else:
+    SELENIUM_AVAILABLE = True
 
 # Import our custom webdriver utility
 from .webdriver_utils import setup_webdriver
@@ -658,5 +663,12 @@ class LinkedInScraper:
 
 def render_linkedin_scraper():
     """Render the LinkedIn job scraper interface"""
+    if not SELENIUM_AVAILABLE:
+        st.info(
+            "LinkedIn scraping requires the optional Selenium dependencies and "
+            "a local Chrome installation."
+        )
+        return
+
     # Don't show the title again, as it's already shown in the job_search.py file
     LinkedInScraper.main(show_title=False)
