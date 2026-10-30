@@ -32,8 +32,9 @@ def get_chrome_version():
                 if os.path.exists(expanded_path):
                     # Use WMIC to get version info on Windows
                     try:
+                        escaped_path = expanded_path.replace("\\", "\\\\")
                         output = subprocess.check_output(
-                            ['wmic', 'datafile', 'where', f'name="{expanded_path.replace("\\", "\\\\")}"', 'get', 'Version', '/value'],
+                            ['wmic', 'datafile', 'where', f'name="{escaped_path}"', 'get', 'Version', '/value'],
                             stderr=subprocess.STDOUT
                         )
                         version_str = output.decode('utf-8').strip()
